@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/compose/transporter.svg?style=svg)](https://circleci.com/gh/compose/transporter) [![Go Report Card](https://goreportcard.com/badge/github.com/compose/transporter)](https://goreportcard.com/report/github.com/compose/transporter)
+[![Circle CI](https://circleci.com/gh/compose/transporter.svg?style=svg)](https://circleci.com/gh/compose/transporter)
 
 Compose helps with database transformations from one store to another.  It can also sync from one to another or several stores.
 
@@ -73,32 +73,15 @@ Complete beginners guide
     - using the homebrew package manager `brew install hg` [Homebrew Guide/Install](http://brew.sh/)
 - install the Mac OS X binary build from https://golang.org/dl/
 - follow instructions on http://golang.org/doc/install
-- VERY IMPORTANT: Go has a required directory structure which the GOPATH needs to point to. Instructions can be found on http://golang.org/doc/code.html or by typing `go help gopath` in terminal.
+- VERY IMPORANT: Go has a required directory structure which the GOPATH needs to point to. Instructions can be found on http://golang.org/doc/code.html or by typing `go help gopath` in terminal.
 - setup the directory structure in $GOPATH
     - `cd $GOPATH; mkdir src pkg bin`
     - create the github.com path and compose `mkdir -p src/github.com/compose; cd src/github.com/compose`
     - clone transporter `git clone https://github.com/compose/transporter; cd transporter`
-    - make sure godep is installed, `go get github.com/tools/godep`
-    - run `godep restore` to get all the dependencies as specified in `Godeps.json`
-    - now you can build with `godep go build -a ./cmd/...`
+    - run go get to get all the dependencies `go get -a ./cmd/...`
+    - now you can build `go build -a ./cmd/...`
 
 At this point you should be able to run transporter via `$GOPATH/bin/transporter`,  you may need to add $GOPATH to your PATH environment variable. Something along the lines of `export PATH="$GOPATH/bin:$PATH"` should work.
-
-### Vagrant
-
-* ensure [vagrant](https://www.vagrantup.com/) is installed
-* ensure [ansible](http://www.ansible.com/) is installed
-* ensure either [virtual box](https://www.virtualbox.org/wiki/Downloads) or [VMWare fusion](http://www.vmware.com/products/fusion) or [VMWare Workstation](http://www.vmware.com/products/workstation) is installed
-
-```bash
-> cd transporter
-> vagrant up
-...
-> vagrant ssh
-...
-vagrant> ./run-test
-
-```
 
 ### Windows
 
@@ -114,10 +97,6 @@ Contributing to Transporter
 
 Want to help out with Transporter? Great! There are instructions to get you
 started [here](CONTRIBUTING.md).
-
-IRC
-=========
-Want to talk about Transporter? Join us in #compose on irc.freenode.net!
 
 Licensing
 =========
