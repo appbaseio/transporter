@@ -5,11 +5,23 @@ Compose helps with database transformations from one store to another.  It can a
 Transporter
 ===========
 
+
+
 Build
 -----
-make sure godep is installed, `go get github.com/tools/godep` and then build with
-`godep restore`
+`go get github.com/compose/transporter`  
+`cd $GOPATH/src/github.com/compose/transporter`  
+`git remote add fork https://github.com/cleitonmarx/transporter`  
+`git pull fork master`
+
+make sure godep is installed, `go get github.com/tools/godep` and then build with  
+`godep restore`  
 `godep go build -a ./cmd/...`
+
+Install
+-----
+Create a build  
+`godep go install ./cmd/...`  
 
 
 Configure
@@ -83,6 +95,22 @@ Complete beginners guide
 
 At this point you should be able to run transporter via `$GOPATH/bin/transporter`,  you may need to add $GOPATH to your PATH environment variable. Something along the lines of `export PATH="$GOPATH/bin:$PATH"` should work.
 
+### Vagrant
+
+* ensure [vagrant](https://www.vagrantup.com/) is installed
+* ensure [ansible](http://www.ansible.com/) is installed
+* ensure either [virtual box](https://www.virtualbox.org/wiki/Downloads) or [VMWare fusion](http://www.vmware.com/products/fusion) or [VMWare Workstation](http://www.vmware.com/products/workstation) is installed
+
+```bash
+> cd transporter
+> vagrant up
+...
+> vagrant ssh
+...
+vagrant> ./run-test
+
+```
+
 ### Windows
 
 See [READMEWINDOWS.md](https://github.com/compose/transporter/blob/master/READMEWINDOWS.md)
@@ -97,6 +125,10 @@ Contributing to Transporter
 
 Want to help out with Transporter? Great! There are instructions to get you
 started [here](CONTRIBUTING.md).
+
+IRC
+=========
+Want to talk about Transporter? Join us in #compose on irc.freenode.net!
 
 Licensing
 =========

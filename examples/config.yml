@@ -1,0 +1,20 @@
+nodes:
+  localmongo:
+    type: mongo
+    uri: mongodb://127.0.0.1:27017/testdb
+  appbaseapp:
+    type: appbase
+    username: <USERNAME>
+    password: <PASSWORD>
+  debug:
+    type: file
+    uri: stdout://
+  sourcefile:
+    type: file
+    uri: file://./sourcefile.json
+  sourcetransformfile:
+    type: file
+    uri: file://./sourcetransformfile.json
+  savedfile:
+    type: file
+    uri: file://./savedfile.json

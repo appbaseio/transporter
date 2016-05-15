@@ -63,6 +63,11 @@
 			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		},
 		{
+			"ImportPath": "github.com/olivere/elastic",
+			"Comment": "v2.0.0-6-g358aa1d",
+			"Rev": "358aa1d19035cb184a82831cbe2f9d6cf373abf6"
+		},
+		{
 			"ImportPath": "github.com/robertkrimen/otto",
 			"Rev": "dea31a3d392779af358ec41f77a07fcc7e9d04ba"
 		},
