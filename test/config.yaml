@@ -54,6 +54,6 @@ nodes:
     type: kinesis
     awsaccesskey: XXXX
     awssecretkey: XXXX
-    awsrregionname: us-east-1
+    awsregionname: us-east-1
     streamname: appbase_test
     sharditeratortype: TRIM_HORIZON
