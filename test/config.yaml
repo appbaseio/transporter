@@ -57,3 +57,7 @@ nodes:
     awsregionname: us-east-1
     streamname: appbase_test
     sharditeratortype: TRIM_HORIZON
+  appbaseapp:
+    type: appbase
+    username: XXXX
+    password: XXXX
