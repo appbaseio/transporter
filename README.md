@@ -11,7 +11,7 @@ Build
 -----
 `go get github.com/compose/transporter`  
 `cd $GOPATH/src/github.com/compose/transporter`  
-`git remote add fork https://github.com/cleitonmarx/transporter`  
+`git remote add fork https://github.com/appbaseio/transporter`  
 `git pull fork master`
 
 make sure godep is installed, `go get github.com/tools/godep` and then build with  
