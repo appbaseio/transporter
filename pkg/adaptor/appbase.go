@@ -151,7 +151,7 @@ func (a *Appbase) addBulkCommand(msg *message.Msg) (*message.Msg, error) {
 		break
 	}
 
-	a.commitBulk(false)
+	a.commitBulk(true)
 
 	return msg, nil
 }
@@ -186,6 +186,7 @@ func (a *Appbase) commitBulk(commitNow bool) {
 			a.pipe.Stop()
 		}
 		a.bulkBodySize = 0
+		fmt.Println("appbase: DONE")
 		//		if bulkResponse.Errors {
 		//			for _, item := range bulkResponse.Failed() {
 		//				a.pipe.Err <- NewError(ERROR, a.path, fmt.Sprintf("appbase bulk error id:%s (%s)", item.Id, item.Error), nil)
