@@ -152,8 +152,9 @@ func (k *Kinesis) getRecords(shardId string, wg *sync.WaitGroup) (err error) {
 			var doc []byte
 
 			for _, d := range resp11.Records {
-				doc = d.GetData()                                                                         
-				k.pipe.Send(message.NewMsg(message.Insert, doc, fmt.Sprintf("kinesis.%s", k.streamName))) 
+				doc = d.GetData() 
+				document := string(doc[:])
+				k.pipe.Send(message.NewMsg(message.Insert, document, fmt.Sprintf("kinesis.%s", k.streamName))) 
 			}
 		} else if resp11.NextShardIterator == "" || shardIterator == resp11.NextShardIterator || err != nil {
 			k.pipe.Err <- NewError(ERROR, k.path, fmt.Sprintf("GetRecords data error (%s)", err.Error()), nil)
