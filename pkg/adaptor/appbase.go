@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 	"regexp"
+	"strconv"
 	"sync"
 
 	"github.com/compose/transporter/pkg/message"
@@ -33,11 +34,12 @@ type Appbase struct {
 	bulkService *elastic.BulkService
 	bulkMutex   *sync.Mutex
 	//timerDoneChan chan struct{}
-	count    int
-	username string
-	password string
-	debug    bool
-	bulkSize int
+	count      int
+	username   string
+	password   string
+	debug      bool
+	bulkSize   int
+	BulkMethod bool
 
 	running      bool
 	bulkBodySize int
@@ -81,10 +83,11 @@ func NewAppbase(p *pipe.Pipe, path string, extra Config) (StopStartListener, err
 		pipe:      p,
 		bulkMutex: &sync.Mutex{},
 		//timerDoneChan: make(chan struct{}),
-		bulkSize: conf.BulkSize,
-		debug:    conf.Debug,
-		username: conf.UserName,
-		password: conf.Password,
+		bulkSize:   conf.BulkSize,
+		BulkMethod: conf.BulkMethod,
+		debug:      conf.Debug,
+		username:   conf.UserName,
+		password:   conf.Password,
 	}
 
 	appbase.debugLog("Appbase conf: %#v", conf)
@@ -113,7 +116,7 @@ func (a *Appbase) Listen() error {
 
 	a.running = true
 
-	return a.pipe.Listen(a.addBulkCommand, a.typeMatch)
+	return a.pipe.Listen(a.parseData, a.typeMatch)
 }
 
 // Stop the adaptor
@@ -127,8 +130,9 @@ func (a *Appbase) Stop() error {
 	return nil
 }
 
-func (a *Appbase) addBulkCommand(msg *message.Msg) (*message.Msg, error) {
-	id, err := msg.IDString("_id")
+func (a *Appbase) parseData(msg *message.Msg) (*message.Msg, error) {
+	id, err := msg.IDString("id")
+
 	if err != nil {
 		id = ""
 	}
@@ -145,13 +149,19 @@ func (a *Appbase) addBulkCommand(msg *message.Msg) (*message.Msg, error) {
 		a.bulkService.Add(bulkRequest)
 		break
 	default:
-		bulkRequest := elastic.NewBulkIndexRequest().Index(a.appName).Type(a.typename).Id(id).Doc(msg.Data)
-		a.AddBulkRequestSize(bulkRequest)
-		a.bulkService.Add(bulkRequest)
-		break
-	}
 
-	a.commitBulk(true)
+		if a.BulkMethod {
+			bulkRequest := elastic.NewBulkIndexRequest().Index(a.appName).Type(a.typename).Id(id).Doc(msg.Data)
+			a.AddBulkRequestSize(bulkRequest)
+			a.bulkService.Add(bulkRequest)
+			a.commitBulk(true)
+		} else {
+			indexRequest := a.client.Index().Index(a.appName).Type(a.typename).Id(strconv.FormatInt(msg.Timestamp, 10)).BodyJson(msg.Data)
+			fmt.Println("Using appbase index method")
+			a.commitIndexMethod(indexRequest)
+			break
+		}
+	}
 
 	return msg, nil
 }
@@ -174,25 +184,33 @@ func (a *Appbase) setupClient() error {
 }
 
 func (a *Appbase) commitBulk(commitNow bool) {
-	//
 	if a.bulkBodySize >= a.bulkSize || a.bulkService.NumberOfActions() >= APPBASE_BUFFER_LEN || commitNow {
 		a.debugLog("Appbase: Sending %d documents.", a.bulkService.NumberOfActions())
 		a.count += a.bulkService.NumberOfActions()
 		a.debugLog("Appbase request size: %d", a.bulkBodySize)
 
 		_, err := a.bulkService.Do()
+
 		if err != nil {
 			a.pipe.Err <- NewError(CRITICAL, a.path, fmt.Sprintf("appbase error (%s)", err), nil)
-			a.pipe.Stop()
+			//a.pipe.Stop()
+			return
 		}
 		a.bulkBodySize = 0
 		fmt.Println("appbase: DONE")
-		//		if bulkResponse.Errors {
-		//			for _, item := range bulkResponse.Failed() {
-		//				a.pipe.Err <- NewError(ERROR, a.path, fmt.Sprintf("appbase bulk error id:%s (%s)", item.Id, item.Error), nil)
-		//			}
-		//		}
 	}
+}
+
+func (a *Appbase) commitIndexMethod(indexRequest *elastic.IndexService) {
+	_, err := indexRequest.Do()
+
+	if err != nil {
+		a.pipe.Err <- NewError(CRITICAL, a.path, fmt.Sprintf("appbase error (%s)", err), nil)
+		return
+	}
+
+	fmt.Println("appbase: DONE")
+
 }
 
 func (a *Appbase) debugLog(format string, v ...interface{}) {
@@ -211,10 +229,11 @@ func (a *Appbase) AddBulkRequestSize(bulkRequest elastic.BulkableRequest) {
 }
 
 type AppbaseConfig struct {
-	URI       string `json:"uri" doc:"the uri to connect to, in the form https://scalr.api.appbase.io`
-	UserName  string `json:"username" doc:"appbase application username`
-	Password  string `json:"password" doc:"appbase application password`
-	Namespace string `json:"namespace" doc:"appbase application name and type to write"`
-	Debug     bool   `json:"debug" doc:"display debug information"`
-	BulkSize  int    `json:"bulksize" doc:"Define the size of the buffer to bulk operations"`
+	URI        string `json:"uri" doc:"the uri to connect to, in the form https://scalr.api.appbase.io`
+	UserName   string `json:"username" doc:"appbase application username`
+	Password   string `json:"password" doc:"appbase application password`
+	Namespace  string `json:"namespace" doc:"appbase application name and type to write"`
+	Debug      bool   `json:"debug" doc:"display debug information"`
+	BulkSize   int    `json:"bulksize" doc:"Define the size of the buffer to bulk operations"`
+	BulkMethod bool   `json:"bulkMethod" doc:"To send data using bulk method"`
 }
