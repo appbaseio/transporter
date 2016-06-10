@@ -61,3 +61,4 @@ nodes:
     type: appbase
     username: XXXX
     password: XXXX
+    BulkMethod: false
